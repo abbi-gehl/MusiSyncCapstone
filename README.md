@@ -1,21 +1,22 @@
 # MusiSyncCapstone
 
-MusiSync is a cross platform application that aims to allow for users to sync their owned music files accross their devices.
+MusiSync is a cross platform application that aims to allow for users to sync their owned music files across their devices.
 
 ## How to Run
 
 TBD
 
 ## Technical Description
-MusiSync aims to accomplish this without a centralised user databse. The decentralised nature we are aiming for means we never handle any files a user sends. This not only ensures user privacy, but helps protect us from copywright infringement claims. Our tool will work on the local network, which aims to limit our tool's usefulness for music piracy and potential cybersecurity risks that were prevlent in applications like Napster.
+MusiSync aims to accomplish this without a centralised user database. The decentralised nature we are aiming for means we never handle any files a user sends. This not only ensures user privacy, but helps protect us from copyright infringement claims. Our tool will work on the local network, which aims to limit our tool's usefulness for music piracy and potential cybersecurity risks that were prevalent in applications like Napster.
 
 ## Tech Stack
-Our current plan for MusicSync is a fairly straightforawrd stack. The networking framework is subject to change as the team does not have much experience in the area.
+Our current plan for MusicSync is a fairly straightforward stack. The networking framework is subject to change as the team does not have much experience in the area.
 
 UI - TypeScript React Native
 
 Middleware - Node JS, Typescript
 
 Backend - React Native File System, Web RTC (Networking)
+
 
 
