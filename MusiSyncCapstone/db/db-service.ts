@@ -29,6 +29,12 @@ export const selectHosts = async (db: SQLiteDatabase) => {
     return hosts;
 };
 
+export const deleteHost = async (db: SQLiteDatabase, id: number) => {
+    const query = `DELETE FROM hosts WHERE id = ?;`;
+    const params = [id];
+    await db.executeSql(query, params);
+}
+
 export const deleteTable = async (db: SQLiteDatabase) => {
     const query = `drop table hosts`;
   
