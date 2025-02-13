@@ -27,6 +27,8 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+import { getDBConnection, createTable, insertHost, selectHosts, deleteTable } from './db/db-service';
+
 const Section: React.FC<
   PropsWithChildren<{
     title: string;
@@ -58,6 +60,15 @@ const Section: React.FC<
 };
 
 const App = () => {
+  getDBConnection().then(async (db) => {
+    await deleteTable(db);
+    await createTable(db);
+    await insertHost(db, 1, 'host1', '00:00:00:00:00:01', '2021-09-01 00:00:00');
+    await insertHost(db, 2, 'host2', '00:00:00:00:00:02', '2021-09-02 00:00:00');
+    const hosts = await selectHosts(db);
+    console.log(hosts);
+  });
+  
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
