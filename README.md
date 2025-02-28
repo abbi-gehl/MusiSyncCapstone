@@ -3,6 +3,7 @@
 MusiSync is a cross platform application that aims to allow for users to sync their owned music files across their devices.
 
 ## How to Run
+First, [set up your enviornment.](https://reactnative.dev/docs/0.76/set-up-your-environment)
 
 Navigate to the downloaded repository in your terminal.
 
