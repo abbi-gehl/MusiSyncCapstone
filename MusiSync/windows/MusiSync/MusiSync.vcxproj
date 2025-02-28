@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- This project was created with react-native-windows 0.74.36 -->
+<!-- This project was created with react-native-windows 0.76.0 -->
 <Project ToolsVersion="Current" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(SolutionDir)\ExperimentalFeatures.props" Condition="Exists('$(SolutionDir)\ExperimentalFeatures.props')" />
   <PropertyGroup Label="Globals">
     <CppWinRTOptimized>true</CppWinRTOptimized>
     <CppWinRTRootNamespaceAutoMerge>true</CppWinRTRootNamespaceAutoMerge>
     <MinimalCoreWin>true</MinimalCoreWin>
-    <ProjectGuid>{8acb3794-1ba8-4d7d-92d4-f1064591b232}</ProjectGuid>
+    <ProjectGuid>{3081bb05-ba39-4385-b7c9-5df8c78d10b3}</ProjectGuid>
     <ProjectName>MusiSync</ProjectName>
     <RootNamespace>MusiSync</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>

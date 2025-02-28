@@ -7,11 +7,11 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="f3629a57-84f0-4e6f-b83f-ba8121d5275f"
+    Name="31ee3c07-8969-4602-809f-c8af35536bd4"
     Publisher="CN=hjbpe"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="f3629a57-84f0-4e6f-b83f-ba8121d5275f" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="31ee3c07-8969-4602-809f-c8af35536bd4" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>MusiSync</DisplayName>
