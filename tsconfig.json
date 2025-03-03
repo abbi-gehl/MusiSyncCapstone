@@ -1,3 +1,13 @@
 {
-  "extends": "@react-native/typescript-config/tsconfig.json"
+  "extends": "@react-native/typescript-config/tsconfig.json",
+
+  "compilerOptions": {
+    "types": ["nativewind/types"], // Add NativeWind types
+    "typeRoots": ["node_modules/@types", "./"] // Ensure custom types are picked up
+  },
+
+  "include": [
+    "src/**/*", // Include your source files
+    "nativewind-env.d.ts" // Ensure the nativewind-env.d.ts file is included
+  ]
 }
