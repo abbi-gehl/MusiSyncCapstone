@@ -18,16 +18,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: yarn install
+        run: npm install
 
       - name: Setup Java for Android builds
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
@@ -62,10 +62,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: yarn install
+        run: npm install
+
+      - name: Setup Java for Android builds
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -106,4 +112,4 @@ jobs:
       - name: Build macOS
         run: |
           cd macos
-          xcodebuild -workspace YourApp.xcworkspace -scheme YourApp -configuration Debug -derivedDataPath build
+          xcodebuild ▋
