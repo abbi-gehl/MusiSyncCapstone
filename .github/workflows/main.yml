@@ -43,13 +43,13 @@ jobs:
       - name: Build Windows
         run: |
           cd windows
-          ./gradlew assembleDebug
+          gradlew assembleDebug
 
       # Android build
       - name: Build Android
         run: |
           cd android
-          ./gradlew assembleDebug
+          gradlew assembleDebug
 
   macos-builds:
     name: iOS and macOS
