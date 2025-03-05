@@ -66,10 +66,12 @@ jobs:
         run: |
              npm install
 
+      - name: Install Visual studio Community
+        run: "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe" modifySettings --installPath "C:\Program Files\Microsoft\Visual Studio\2022\Enterprise" --newChannelUri https://aka.ms/vs/17/release.LTSC.17.0/channel --removeOos true
+
       - name: Install Windows Dependencies
         shell: pwsh
         run: |
-          "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe" modifySettings --installPath "C:\Program Files\Microsoft\Visual Studio\2022\Enterprise" --newChannelUri https://aka.ms/vs/17/release.LTSC.17.0/channel --removeOos true
           Set-ExecutionPolicy Unrestricted -Scope Process -Force;
           iex (New-Object System.Net.WebClient).DownloadString('https://aka.ms/rnw-vs2022-deps.ps1');
 
