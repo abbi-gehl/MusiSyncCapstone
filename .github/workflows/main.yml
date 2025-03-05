@@ -1,115 +1,37 @@
-name: React Native Multi-Platform CI
+name: Build Android app
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
-  windows-builds:
-    name: Windows and Android
-    runs-on: windows-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Setup Java for Android builds
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      # Windows build
-      - name: Build Windows
-        run: |
-          cd windows
-          gradlew assembleDebug
-
-      # Android build
-      - name: Build Android
-        run: |
-          cd android
-          gradlew assembleDebug
-
-  macos-builds:
-    name: iOS and macOS
+  build:
     runs-on: macos-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: Setup Node.js
+      - name: Install Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: adopt
+          cache: gradle
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Setup Node  
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: 'yarn'
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Setup Java for Android builds
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.0'
-          bundler-cache: true
-
-      - name: Install CocoaPods
+      - name: Run Yarn Install
         run: |
-          gem install cocoapods
-          pod setup
+             npm i -g corepack
+             yarn install
 
-      - name: Cache CocoaPods dependencies
-        uses: actions/cache@v3
-        with:
-          path: Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
-
-      # iOS build
-      - name: Install iOS dependencies
+      - name: Build application
         run: |
-          cd ios
-          pod install
-
-      - name: Build iOS
-        run: |
-          cd ios
-          xcodebuild -workspace YourApp.xcworkspace -scheme YourApp -configuration Debug -sdk iphonesimulator -derivedDataPath build
-
-      # macOS build
-      - name: Install macOS dependencies
-        run: |
-          cd macos
-          pod install
-
-      - name: Build macOS
-        run: |
-          cd macos
-          xcodebuild ▋
+             cd android
+             ./gradlew assembleRelease
