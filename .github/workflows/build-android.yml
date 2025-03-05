@@ -1,7 +1,9 @@
 name: Build Android app
 
 on:
-  push:
+  pull_request:
+    branches:
+      - main
 
 jobs:
   Build-Android:
