@@ -16,3 +16,9 @@ jobs:
         shell: pwsh
         run: |
           Invoke-WebRequest -Uri "https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSFeaturesPage&passive=true&tailored=.net&cid=2032#dotnet" -OutFile "VisualStudioSetup.exe"
+
+      - name: Install React-Native-Windows Dependencies
+        shell: pwsh
+        run: |
+          Set-ExecutionPolicy Unrestricted -Scope Process -Force;
+          iex (New-Object System.Net.WebClient).DownloadString('https://aka.ms/rnw-vs2022-deps.ps1');
