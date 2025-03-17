@@ -1,11 +1,13 @@
 import React from "react";
-import {View, Text, TouchableOpacity, Pressable } from 'react-native';
+import {View, Text, TouchableOpacity, Pressable, Alert, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Menu } from "lucide-react-native"; // Install this library or use another icon package
 import "nativewind";
 
+import { useTCP } from "../service/TCPProvider";
+import NetInfo from "@react-native-community/netinfo";
 
 type RootStackParamList = {
     LandingPage: undefined;
@@ -16,8 +18,13 @@ type NavigationProp = StackNavigationProp<RootStackParamList, 'LandingPage'>;
 
 const LandingPage = () => {
     const insets = useSafeAreaInsets();
+    
     const navigation = useNavigation<NavigationProp>();
-
+    
+    const { startServer, connectToServer } = useTCP();
+    const [IP, setIP] = React.useState<string>("");
+    const port = 5050;
+    
     return (
       <SafeAreaView className="flex-1 bg-transparent gap-2" style={{ paddingTop: insets.top }}>
           {/* First Section (2/5 of the Screen) */}
@@ -63,7 +70,6 @@ const LandingPage = () => {
                   <Text className="text-2xl font-semibold text-white dark:text-white text-center m-4">
                       No email is required! Just click below to link devices.
                   </Text>
-
                   <Pressable className="my-10 items-center">
                       <View className="bg-buttonBlue border-2 border-gray-500 rounded-2xl p-4 px-6 w-2/3">
                           <Text className="text-2xl text-center font-bold text-white dark:text-white">

@@ -6,20 +6,23 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import "nativewind"
 import "../global.css"
+import { TCPProvider } from './service/TCPProvider';
 
 const Stack = createStackNavigator();
 
 
 const App = () => {
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="LandingPage">
-            <Stack.Screen name="LandingPage" component={LandingPage} options={{headerShown: false}}/>
-            <Stack.Screen name="HomePage" component={HomePage} options={{headerShown: false}} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+      <SafeAreaProvider>
+        <TCPProvider>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="LandingPage">
+                <Stack.Screen name="LandingPage" component={LandingPage} options={{headerShown: false}}/>
+                <Stack.Screen name="HomePage" component={HomePage} options={{headerShown: false}} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </TCPProvider>
+      </SafeAreaProvider>
   );
 };
 
