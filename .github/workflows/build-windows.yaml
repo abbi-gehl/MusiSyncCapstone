@@ -1,24 +1,26 @@
-name: Build Windows App
-
-on:
-  pull_request:
-    branches:
-      - main
+name: Windows CI
+on: [pull_request]
 
 jobs:
-  Build-Windows:
-    runs-on: windows-latest
+  run-windows-tests:
+    name: Build & run tests
+    runs-on: windows-2022
+
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        name: Checkout Code
 
-      - name: Download .NET installer
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSFeaturesPage&passive=true&tailored=.net&cid=2032#dotnet" -OutFile "VisualStudioSetup.exe"
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '^18'
 
-      - name: Install React-Native-Windows Dependencies
-        shell: pwsh
-        run: |
-          Set-ExecutionPolicy Unrestricted -Scope Process -Force;
-          iex (New-Object System.Net.WebClient).DownloadString('https://aka.ms/rnw-vs2022-deps.ps1');
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install node modules
+        run: yarn --frozen-lockfile
+
+      - name: Run Windows x64 release
+        run: npx react-native run-windows --arch x64 --release --logging
+
