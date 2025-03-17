@@ -6,6 +6,7 @@ module.exports = {
     extend: {
       colors: {
         accentBlue: "#ADE1EF", // light blue accent
+        buttonBlue: "#4EBCDA",  //medium teal for buttons
         accentPeach: "#FFC196", // peach accent color
         background: "#CF9B9B", // salmon background
         lightText: "#ffffff", // white text

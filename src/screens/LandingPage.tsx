@@ -1,47 +1,58 @@
 import React from "react";
 import {View, Text, TouchableOpacity, Pressable, Alert, TextInput } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { StackNavigationProp } from '@react-navigation/stack';
 import { Menu } from "lucide-react-native"; // Install this library or use another icon package
 import "nativewind";
 
 import { useTCP } from "../service/TCPProvider";
 import NetInfo from "@react-native-community/netinfo";
 
+type RootStackParamList = {
+    LandingPage: undefined;
+    HomePage: undefined;
+};
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'LandingPage'>;
+
 const LandingPage = () => {
     const insets = useSafeAreaInsets();
+    
+    const navigation = useNavigation<NavigationProp>();
+    
     const { startServer, connectToServer } = useTCP();
     const [IP, setIP] = React.useState<string>("");
     const port = 5050;
+    
     return (
-      <SafeAreaView className="flex-1 bg-transparent" style={{ paddingTop: insets.top }}>
+      <SafeAreaView className="flex-1 bg-transparent gap-2" style={{ paddingTop: insets.top }}>
           {/* First Section (2/5 of the Screen) */}
-          <View className="flex-[2] bg-transparent px-6 my-3">
+          <View className="flex-[2] bg-transparent px-6 my-2">
               {/* Header with MusiSync & Menu Button */}
-              <View className="flex-row items-center justify-between w-full my-4">
+              <View className="flex-row items-center justify-between w-full my-2">
 
-                  <TouchableOpacity className="p-2 flex-1">
-                      <Menu size={32} color="black" />
+                  {/* Hamburger Menu Button */}
+                  <TouchableOpacity className="p-2 flex-[2]">
+                      <Menu size={48} color="black" />
                   </TouchableOpacity>
 
-                  <View className="items-center justify-center bg-accentPeach rounded-3xl p-4 flex-2">
-                      <Text className="text-xl font-bold text-black dark:text-white">
+                  <View className="items-center justify-center bg-accentPeach rounded-3xl p-4 flex-[4]">
+                      <Text className="text-4xl font-extrabold text-black dark:text-white">
                           MusiSync
                       </Text>
                   </View>
-
-                  {/* Hamburger Menu Button */}
-
               </View>
 
               {/* Login Prompt */}
-              <View className="flex-1 justify-center items-center bg-background rounded-[50] p-4">
-                  <Text className="text-xl font-semibold text-white dark:text-white">
+              <View className="flex-1 justify-center items-center  bg-background rounded-[50] p-4 my-2">
+                  <Text className="text-3xl font-semibold text-white dark:text-white">
                       Ready to Sync?
                   </Text>
 
-                  <Pressable className="my-10">
-                      <View className="bg-accentBlue rounded-2xl p-4 px-6">
-                          <Text className="text-xl font-bold text-white dark:text-white">
+                  <Pressable className="my-10" onPress={() => navigation.navigate('HomePage')}>
+                      <View className="bg-buttonBlue rounded-2xl border-2 border-gray-500 w-2/5 p-4 px-6">
+                          <Text className="text-2xl font-bold text-white dark:text-white">
                               Continue
                           </Text>
                       </View>
@@ -51,60 +62,21 @@ const LandingPage = () => {
 
           {/* Second Section (3/5 of the Screen) */}
           <View className="flex-[3] bg-transparent ">
-              <View className="flex-1 justify-center items-center bg-background rounded-br-none rounded-bl-none rounded-[50] p-4 w-screen">
-                  <Text className="text-xl font-semibold text-white dark:text-white text-center m-5 my-10">
+              <View className="flex-1 bg-background rounded-br-none rounded-bl-none rounded-[50] p-4 w-screen">
+                  <Text className="text-3xl font-semibold text-white dark:text-white text-center m-5 my-10">
                       It's easy to get started with MusiSync!
                   </Text>
 
-                  <Text className="text-xl font-semibold text-white dark:text-white text-center">
+                  <Text className="text-2xl font-semibold text-white dark:text-white text-center m-4">
                       No email is required! Just click below to link devices.
                   </Text>
-
-                  <Pressable className="my-10" onPress={() => NetInfo.fetch().then(state => console.log(state))}>
-                      <View className="bg-accentBlue rounded-2xl p-4 px-6 w-1/2">
-                          <Text className="text-xl text-center font-bold text-white dark:text-white">
-                              Get Networking Info
+                  <Pressable className="my-10 items-center">
+                      <View className="bg-buttonBlue border-2 border-gray-500 rounded-2xl p-4 px-6 w-2/3">
+                          <Text className="text-2xl text-center font-bold text-white dark:text-white">
+                              Add Device
                           </Text>
                       </View>
                   </Pressable>
-
-                  <Pressable className="my-10" onPress={() => startServer(port)}>
-                      <View className="bg-accentBlue rounded-2xl p-4 px-6 w-1/2">
-                          <Text className="text-xl text-center font-bold text-white dark:text-white">
-                              Start Server
-                          </Text>
-                      </View>
-                  </Pressable>
-
-                <View className="my-6 w-4/5">
-                    <Text className="text-lg font-semibold text-white mb-2">
-                        Enter IP Address:
-                    </Text>
-                    <View className="flex-row items-center">
-                        <TextInput
-                            className="bg-white text-black p-3 rounded-l-lg flex-1"
-                            placeholder="192.168.1.1"
-                            value={IP}
-                            onChangeText={setIP}
-                            keyboardType="numeric"
-                        />
-                        <Pressable 
-                            className="bg-accentPeach p-3 rounded-r-lg"
-                            onPress={() => {
-                                if (IP.trim()) {
-                                    console.log(`Using IP: ${IP}`);
-                                    const addr = IP.split(":");
-                                    connectToServer(addr[0], parseInt(addr[1], 10));
-                                } else {
-                                    Alert.alert("Please enter a valid IP address");
-                                }
-                            }}
-                        >
-                            <Text className="text-white font-bold">Connect</Text>
-                        </Pressable>
-                    </View>
-                </View>
-
               </View>
           </View>
       </SafeAreaView>

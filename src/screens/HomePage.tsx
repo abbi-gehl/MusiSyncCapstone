@@ -1,0 +1,91 @@
+import React from "react";
+import {View, Text, TouchableOpacity, Pressable } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { Menu, CloudUpload, CloudDownload, RefreshCcw, Folder } from "lucide-react-native"; // Install this library or use another icon package
+import "nativewind";
+import {StackNavigationProp} from '@react-navigation/stack';
+import {useNavigation} from '@react-navigation/native';
+
+type RootStackParamList = {
+  LandingPage: undefined;
+  HomePage: undefined;
+};
+
+type NavigationProp = StackNavigationProp<RootStackParamList,'HomePage'>;
+
+const LandingPage = () => {
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation<NavigationProp>();
+
+  return (
+    <SafeAreaView className="flex-1 bg-transparent" style={{ paddingTop: insets.top }}>
+      {/* First Section (1/6 of the Screen) */}
+      <View className="flex-[1] bg-transparent px-6 my-2">
+        {/* Header with MusiSync & Menu Button */}
+        <View className="flex-row items-center justify-between w-full my-2">
+
+          {/* Hamburger Menu Button */}
+          <TouchableOpacity className="p-2 flex-[2]">
+            <Menu size={48} color="black" />
+          </TouchableOpacity>
+
+          <View className="items-center justify-center bg-accentPeach rounded-3xl p-4 flex-[4]">
+            <Text className="text-4xl font-extrabold text-black dark:text-white">
+              MusiSync
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Second Section (5/6 of the Screen) */}
+      <View className="flex-[6] bg-transparent">
+        <View className="flex-1 bg-background rounded-br-none rounded-bl-none justify-start rounded-[50] w-full p-4 gap-y-8">
+          {/*Upload Button*/}
+          <Pressable className="mx-0" onPress={() => navigation.navigate('LandingPage')}>
+            <View className="bg-transparent flex-row items-center p-2 mt-6">
+                <View className="w-12 mx-2">
+                  <CloudUpload size={48} color="black"/>
+                </View>
+                <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
+                  Send Files to other Devices
+                </Text>
+            </View>
+          </Pressable>
+
+          {/*Download Button*/}
+          <View className="bg-transparent flex-row items-center p-2 mt-6">
+            <View className="w-12 mx-2">
+              <CloudDownload size={48} color="black"/>
+            </View>
+            <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
+              Download Files to other Devices
+            </Text>
+          </View>
+
+          {/*Download Button*/}
+          <View className=" bg-transparent flex-row items-center p-2 mt-8 gap-y-[8]">
+            <View className="w-12 mx-2">
+              <RefreshCcw size={48} color="black"/>
+            </View>
+            <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
+              Full Library Sync
+            </Text>
+          </View>
+
+          {/*Download Button*/}
+          <View className=" bg-transparent flex-row items-center p-2 mt-6">
+            <View className="w-12 mx-2">
+              <Folder size={48} color="black"/>
+            </View>
+            <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
+              View Music Folder
+            </Text>
+          </View>
+
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+export default LandingPage;
