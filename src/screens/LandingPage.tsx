@@ -1,13 +1,17 @@
 import React from "react";
-import {View, Text, TouchableOpacity, Pressable } from 'react-native';
+import {View, Text, TouchableOpacity, Pressable, Alert, TextInput } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Menu } from "lucide-react-native"; // Install this library or use another icon package
 import "nativewind";
 
+import { useTCP } from "../service/TCPProvider";
+import NetInfo from "@react-native-community/netinfo";
 
 const LandingPage = () => {
     const insets = useSafeAreaInsets();
-
+    const { startServer, connectToServer } = useTCP();
+    const [IP, setIP] = React.useState<string>("");
+    const port = 5050;
     return (
       <SafeAreaView className="flex-1 bg-transparent" style={{ paddingTop: insets.top }}>
           {/* First Section (2/5 of the Screen) */}
@@ -47,7 +51,7 @@ const LandingPage = () => {
 
           {/* Second Section (3/5 of the Screen) */}
           <View className="flex-[3] bg-transparent ">
-              <View className="flex-1 justify-center bg-background rounded-br-none rounded-bl-none rounded-[50] p-4 w-screen">
+              <View className="flex-1 justify-center items-center bg-background rounded-br-none rounded-bl-none rounded-[50] p-4 w-screen">
                   <Text className="text-xl font-semibold text-white dark:text-white text-center m-5 my-10">
                       It's easy to get started with MusiSync!
                   </Text>
@@ -56,13 +60,50 @@ const LandingPage = () => {
                       No email is required! Just click below to link devices.
                   </Text>
 
-                  <Pressable className="my-10">
+                  <Pressable className="my-10" onPress={() => NetInfo.fetch().then(state => console.log(state))}>
                       <View className="bg-accentBlue rounded-2xl p-4 px-6 w-1/2">
                           <Text className="text-xl text-center font-bold text-white dark:text-white">
-                              Continue
+                              Get Networking Info
                           </Text>
                       </View>
                   </Pressable>
+
+                  <Pressable className="my-10" onPress={() => startServer(port)}>
+                      <View className="bg-accentBlue rounded-2xl p-4 px-6 w-1/2">
+                          <Text className="text-xl text-center font-bold text-white dark:text-white">
+                              Start Server
+                          </Text>
+                      </View>
+                  </Pressable>
+
+                <View className="my-6 w-4/5">
+                    <Text className="text-lg font-semibold text-white mb-2">
+                        Enter IP Address:
+                    </Text>
+                    <View className="flex-row items-center">
+                        <TextInput
+                            className="bg-white text-black p-3 rounded-l-lg flex-1"
+                            placeholder="192.168.1.1"
+                            value={IP}
+                            onChangeText={setIP}
+                            keyboardType="numeric"
+                        />
+                        <Pressable 
+                            className="bg-accentPeach p-3 rounded-r-lg"
+                            onPress={() => {
+                                if (IP.trim()) {
+                                    console.log(`Using IP: ${IP}`);
+                                    const addr = IP.split(":");
+                                    connectToServer(addr[0], parseInt(addr[1], 10));
+                                } else {
+                                    Alert.alert("Please enter a valid IP address");
+                                }
+                            }}
+                        >
+                            <Text className="text-white font-bold">Connect</Text>
+                        </Pressable>
+                    </View>
+                </View>
 
               </View>
           </View>

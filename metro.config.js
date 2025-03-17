@@ -1,6 +1,7 @@
 const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 const { withNativeWind } = require("nativewind/metro");
 
+const defaultConfig = getDefaultConfig(__dirname);
 
 const fs = require('fs');
 const path = require('path');
@@ -22,6 +23,7 @@ const rnwPath = fs.realpathSync(
 const config = mergeConfig(getDefaultConfig(__dirname),{
   //
   resolver: {
+    assetExts: [...defaultConfig.resolver.assetExts, 'pem', 'p12'],
     blockList: exclusionList([
       // This stops "npx @react-native-community/cli run-windows" from causing the metro server to crash if its already running
       new RegExp(
