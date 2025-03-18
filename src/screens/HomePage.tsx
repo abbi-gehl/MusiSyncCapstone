@@ -5,10 +5,12 @@ import { Menu, CloudUpload, CloudDownload, RefreshCcw, Folder } from "lucide-rea
 import "nativewind";
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
+import {pickFile, readFile} from '@dr.pogodin/react-native-fs'
 
 type RootStackParamList = {
   LandingPage: undefined;
   HomePage: undefined;
+  ChooseFilePage: undefined;
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList,'HomePage'>;
@@ -53,14 +55,16 @@ const LandingPage = () => {
           </Pressable>
 
           {/*Download Button*/}
-          <View className="bg-transparent flex-row items-center p-2 mt-6">
-            <View className="w-12 mx-2">
-              <CloudDownload size={48} color="black"/>
+          <Pressable className="mx-0" onPress={() => navigation.navigate('ChooseFilePage')}>
+            <View className="bg-transparent flex-row items-center p-2 mt-6">
+              <View className="w-12 mx-2">
+                <CloudDownload size={48} color="black"/>
+              </View>
+              <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
+                Download Files to other Devices
+              </Text>
             </View>
-            <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
-              Download Files to other Devices
-            </Text>
-          </View>
+          </Pressable>
 
           {/*Download Button*/}
           <View className=" bg-transparent flex-row items-center p-2 mt-8 gap-y-[8]">
@@ -73,14 +77,22 @@ const LandingPage = () => {
           </View>
 
           {/*Download Button*/}
-          <View className=" bg-transparent flex-row items-center p-2 mt-6">
-            <View className="w-12 mx-2">
-              <Folder size={48} color="black"/>
+          <Pressable className="mx-0" onPress={async () => {
+            const files = await pickFile();
+            if (files.length > 0) {
+              const content = await readFile(files[0]);
+              console.log(content);
+            }
+          }}>
+            <View className=" bg-transparent flex-row items-center p-2 mt-6">
+              <View className="w-12 mx-2">
+                <Folder size={48} color="black"/>
+              </View>
+              <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
+                View Music Folder
+              </Text>
             </View>
-            <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
-              View Music Folder
-            </Text>
-          </View>
+          </Pressable>
 
         </View>
       </View>

@@ -1,6 +1,7 @@
 import React from 'react';
 import LandingPage from "./screens/LandingPage";
 import HomePage from "./screens/HomePage";
+import ChooseFilePage from "./screens/ChooseFilePage";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -19,6 +20,7 @@ const App = () => {
             <Stack.Navigator initialRouteName="LandingPage">
                 <Stack.Screen name="LandingPage" component={LandingPage} options={{headerShown: false}}/>
                 <Stack.Screen name="HomePage" component={HomePage} options={{headerShown: false}} />
+                <Stack.Screen name="ChooseFilePage" component={ChooseFilePage} options={{headerShown: false}} />
             </Stack.Navigator>
           </NavigationContainer>
         </TCPProvider>
