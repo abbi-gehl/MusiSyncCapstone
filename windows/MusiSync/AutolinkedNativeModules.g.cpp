@@ -3,12 +3,41 @@
 #include "pch.h"
 #include "AutolinkedNativeModules.g.h"
 
+// Includes from @dr.pogodin/react-native-fs
+#include <winrt/ReactNativeFs.h>
+
+// Includes from @react-native-community/netinfo
+#include <winrt/ReactNativeNetInfo.h>
+
+// Includes from react-native-device-info
+#include <winrt/RNDeviceInfoCPP.h>
+
+// Includes from react-native-permissions
+#include <winrt/RNPermissions.h>
+
+// Includes from react-native-screens
+#include <winrt/RNScreens.h>
+
+// Includes from react-native-svg
+#include <winrt/RNSVG.h>
+
 namespace winrt::Microsoft::ReactNative
 {
 
 void RegisterAutolinkedNativeModulePackages(winrt::Windows::Foundation::Collections::IVector<winrt::Microsoft::ReactNative::IReactPackageProvider> const& packageProviders)
 { 
-    UNREFERENCED_PARAMETER(packageProviders);
+    // IReactPackageProviders from @dr.pogodin/react-native-fs
+    packageProviders.Append(winrt::ReactNativeFs::ReactPackageProvider());
+    // IReactPackageProviders from @react-native-community/netinfo
+    packageProviders.Append(winrt::ReactNativeNetInfo::ReactPackageProvider());
+    // IReactPackageProviders from react-native-device-info
+    packageProviders.Append(winrt::RNDeviceInfoCPP::ReactPackageProvider());
+    // IReactPackageProviders from react-native-permissions
+    packageProviders.Append(winrt::RNPermissions::ReactPackageProvider());
+    // IReactPackageProviders from react-native-screens
+    packageProviders.Append(winrt::RNScreens::ReactPackageProvider());
+    // IReactPackageProviders from react-native-svg
+    packageProviders.Append(winrt::RNSVG::ReactPackageProvider());
 }
 
 }
