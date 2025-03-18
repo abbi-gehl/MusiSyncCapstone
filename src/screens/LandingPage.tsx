@@ -12,6 +12,7 @@ import NetInfo from "@react-native-community/netinfo";
 type RootStackParamList = {
     LandingPage: undefined;
     HomePage: undefined;
+    ChooseFilePage: undefined;
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'LandingPage'>;
