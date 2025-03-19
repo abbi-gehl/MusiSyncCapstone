@@ -1,15 +1,19 @@
 import { createContext, FC, useCallback, useContext, useState } from "react";
+import { Alert } from "react-native";
 import TcpSocket from 'react-native-tcp-socket';
 
 interface TCPContextType {
     server: any;
     client: any;
+    directory: string;
     isConnected: boolean;
     connectedClient: any;
 
+    setDeviceDirectory: (dir: string) => void;
     startServer: (port: number) => void;
     connectToServer: (host: string, port: number) => void;
     disconnect: () => void;
+    sendData: (data: string) => void;
 }
 
 const TCPContext = createContext<TCPContextType | undefined>(undefined);
@@ -29,9 +33,15 @@ const options = {
 export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
     const [server, setServer] = useState<any>(null);
     const [client, setClient] = useState<any>(null);
+    const [directory, setDirectory] = useState<string>('');
     const [serverSocket, setServerSocket] = useState<any>(null);
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const [connectedClient, setConnectedClient] = useState<any>(null);
+
+    // Set Device Directory helper function
+    const setDeviceDirectory = useCallback((dir: string) => {
+        setDirectory(dir);
+    }, []);
 
     // Disconnect
     const disconnect = useCallback(() => {
@@ -86,6 +96,7 @@ export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
 
     // Connect to Server (client)
     const connectToServer = useCallback((host: string, port: number) => {
+        console.log("Connecting to server @", host, ":", port);
         const newClient = TcpSocket.connectTLS({
             host,
             port,
@@ -116,16 +127,29 @@ export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
         setClient(newClient);
     }, []);
 
+    const sendData = useCallback((data: string) => {
+        const socket = client || server
+        if (!socket) {
+            console.log("No connection to send data");
+            return;
+        }
+
+        socket.write(JSON.stringify({ event: 'data', data: data }));
+    }, [server, client, isConnected]);
+
     return (
         <TCPContext.Provider
             value= {{
                 server,
                 client,
+                directory,
                 isConnected,
                 connectedClient,
+                setDeviceDirectory,
                 startServer,
                 connectToServer,
-                disconnect
+                disconnect,
+                sendData
             }}>
             {children}
         </TCPContext.Provider>
