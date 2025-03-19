@@ -5,7 +5,9 @@ import { Menu, CloudUpload, CloudDownload, RefreshCcw, Folder } from "lucide-rea
 import "nativewind";
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
-import {pickFile, readFile} from '@dr.pogodin/react-native-fs'
+import {pickFile, readFile} from '@dr.pogodin/react-native-fs';
+import { generateHashMap } from '../utils/fsScanner.tsx';
+
 
 type RootStackParamList = {
   LandingPage: undefined;
@@ -66,15 +68,17 @@ const LandingPage = () => {
             </View>
           </Pressable>
 
-          {/*Download Button*/}
-          <View className=" bg-transparent flex-row items-center p-2 mt-8 gap-y-[8]">
-            <View className="w-12 mx-2">
-              <RefreshCcw size={48} color="black"/>
+          {/*Full sync Button, currently used to test hash map*/}
+          <Pressable className="mx-0" onPress={() => generateHashMap()}>
+            <View className=" bg-transparent flex-row items-center p-2 mt-8 gap-y-[8]">
+              <View className="w-12 mx-2">
+                <RefreshCcw size={48} color="black"/>
+              </View>
+              <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
+                Full Library Sync
+              </Text>
             </View>
-            <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
-              Full Library Sync
-            </Text>
-          </View>
+          </Pressable>
 
           {/*Download Button*/}
           <Pressable className="mx-0" onPress={async () => {
