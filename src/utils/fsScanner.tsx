@@ -4,6 +4,13 @@ import { MD5 } from 'react-native-crypto-js';
 type FileHashMap = Record<string, string>; // { fileHash: relativePath }
 const HASH_MAP_FILE = `${RNFS.DocumentDirectoryPath}/fileHashMap.json`;
 
+
+/*
+* TODO: - implement proper directory selecting
+*       - Use music metadata library for hashing only raw music file data
+*       - set up file access permissions screen/popup for user
+* */
+
 // replace with real external path later
 let directory = '/data/user/0/com.musisync';
 
