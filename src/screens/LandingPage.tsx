@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import {View, Text, TouchableOpacity, Pressable, Alert, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StackNavigationProp } from '@react-navigation/stack';
+import Modal from "react-native-modal";
 import { Menu } from "lucide-react-native"; // Install this library or use another icon package
 import "nativewind";
 
@@ -15,17 +16,31 @@ type RootStackParamList = {
     ChooseFilePage: undefined;
 };
 
+
+const CustomModal = ({ isModalVisible, handleModal }) => {
+    return (
+      <Modal isVisible={isModalVisible}>
+          <View className="bg-accentBlue">
+              <Text className="text-black">Link your devices with a Mac Address</Text>
+              <Text className="text-black">If you need more info, check our documentation</Text>
+              <TouchableOpacity title="I agree" onPress={handleModal} />
+          </View>
+      </Modal>
+    );
+};
+
 type NavigationProp = StackNavigationProp<RootStackParamList, 'LandingPage'>;
 
 const LandingPage = () => {
     const insets = useSafeAreaInsets();
     
     const navigation = useNavigation<NavigationProp>();
-    
+    const [isModalVisible, setModalVisible] = useState(false);
+
     const { startServer, connectToServer } = useTCP();
     const [IP, setIP] = React.useState<string>("");
     const port = 5050;
-    
+
     return (
       <SafeAreaView className="flex-1 bg-transparent gap-2" style={{ paddingTop: insets.top }}>
           {/* First Section (2/5 of the Screen) */}
