@@ -16,16 +16,59 @@ type RootStackParamList = {
     ChooseFilePage: undefined;
 };
 
+type CustomModalProps = {
+    isModalVisible: boolean;
+    handleModal: () => void;
+};
 
-const CustomModal = ({ isModalVisible, handleModal }) => {
+
+const CustomModal: React.FC<CustomModalProps> = ({ isModalVisible, handleModal }:
+                     {  isModalVisible: boolean; handleModal: () => void;}) => {
+    // textbox elements
+    const [text, setText] = useState("");
+    const handleSubmit = () => {
+        if (!text.trim()) return;
+
+        // SEND TO DB HERE
+
+        console.log("Submitted Text:", text);
+
+        // Reset + close modal
+        setText("");
+        handleModal();
+    }
+
     return (
-      <Modal isVisible={isModalVisible}>
-          <View className="bg-accentBlue">
-              <Text className="text-black">Link your devices with a Mac Address</Text>
-              <Text className="text-black">If you need more info, check our documentation</Text>
-              <TouchableOpacity title="I agree" onPress={handleModal} />
-          </View>
-      </Modal>
+        <Modal isVisible={isModalVisible}>
+            <View className="bg-accentBlue p-6 rounded-2xl">
+                <Text className="text-black text-lg font-bold mb-2">Link your devices with a Mac Address</Text>
+                <Text className="text-black mb-6">If you need more info, check our documentation</Text>
+
+                <TextInput
+                    value={text}
+                    onChangeText={setText}
+                    placeholder="Enter MAC address or identifier..."
+                    placeholderTextColor="#ccc"
+                    multiline
+                    numberOfLines={4}
+                    className="bg-white rounded-xl p-3 text-black mb-4"
+                />
+                {/* Submit Button */}
+                <Pressable
+                    onPress={handleSubmit}
+                    className="bg-buttonBlue rounded-xl p-3 items-center mb-2"
+                >
+                    <Text className="text-white font-semibold">Submit</Text>
+                </Pressable>
+                {/* Cancel Button */}
+                <Pressable
+                    onPress={handleModal}
+                    className="bg-buttonBlue rounded-xl p-3 items-center"
+                >
+                    <Text className="text-white font-semibold">Close</Text>
+                </Pressable>
+            </View>
+        </Modal>
     );
 };
 
@@ -33,7 +76,6 @@ type NavigationProp = StackNavigationProp<RootStackParamList, 'LandingPage'>;
 
 const LandingPage = () => {
     const insets = useSafeAreaInsets();
-    
     const navigation = useNavigation<NavigationProp>();
     const [isModalVisible, setModalVisible] = useState(false);
 
@@ -86,7 +128,7 @@ const LandingPage = () => {
                   <Text className="text-2xl font-semibold text-white dark:text-white text-center m-4">
                       No email is required! Just click below to link devices.
                   </Text>
-                  <Pressable className="my-10 items-center">
+                  <Pressable className="my-10 items-center" onPress={() => setModalVisible(true)}>
                       <View className="bg-buttonBlue border-2 border-gray-500 rounded-2xl p-4 px-6 w-2/3">
                           <Text className="text-2xl text-center font-bold text-white dark:text-white">
                               Add Device
@@ -95,6 +137,10 @@ const LandingPage = () => {
                   </Pressable>
               </View>
           </View>
+          <CustomModal
+              isModalVisible={isModalVisible}
+              handleModal={() => setModalVisible(false)}
+          />
       </SafeAreaView>
     );
 };
