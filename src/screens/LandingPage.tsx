@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import {View, Text, TouchableOpacity, Pressable, Alert, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRealm, useQuery } from '@realm/react'  // Realm DB for react
+import Realm, { BSON } from 'realm' // Realm DB
 import { StackNavigationProp } from '@react-navigation/stack';
 import Modal from "react-native-modal";
 import { Menu } from "lucide-react-native"; // Install this library or use another icon package
@@ -22,19 +24,43 @@ type CustomModalProps = {
 };
 
 
+
+// Modal popup for handling user input of devices
 const CustomModal: React.FC<CustomModalProps> = ({ isModalVisible, handleModal }:
-                     {  isModalVisible: boolean; handleModal: () => void;}) => {
+                                                 {  isModalVisible: boolean; handleModal: () => void;}) => {
+    const printDatabaseEntries = () => {
+        const hosts = realm.objects("Host");
+        console.log("DB Entries:", JSON.stringify(hosts, null, 2));
+    };
+
     // textbox elements
     const [text, setText] = useState("");
+    const [nameText, setNameText] = useState("");
+
+    const realm = useRealm();
+
     const handleSubmit = () => {
-        if (!text.trim()) return;
+        if (!text.trim() || !nameText.trim()) return;
 
-        // SEND TO DB HERE
 
-        console.log("Submitted Text:", text);
+        // SEND TO DB
+        try {
+            realm.write(() => {
+                realm.create("Host", {
+                    _id: new BSON.ObjectId(),
+                    device_name: nameText,
+                    mac_address: text,
+                    last_sync: new Date(),
+                });
+            });
+            console.log("Device added:", nameText, text);
+        } catch (error) {
+            console.error("Error adding device:", error);
+        }
 
         // Reset + close modal
         setText("");
+        setNameText("")
         handleModal();
     }
 
@@ -45,12 +71,20 @@ const CustomModal: React.FC<CustomModalProps> = ({ isModalVisible, handleModal }
                 <Text className="text-black mb-6">If you need more info, check our documentation</Text>
 
                 <TextInput
+                    value={nameText}
+                    onChangeText={setNameText}
+                    placeholder="Enter Device name..."
+                    placeholderTextColor="#ccc"
+                    numberOfLines={1}
+                    className="bg-white rounded-xl p-3 text-black mb-4"
+                />
+
+                <TextInput
                     value={text}
                     onChangeText={setText}
                     placeholder="Enter MAC address or identifier..."
                     placeholderTextColor="#ccc"
-                    multiline
-                    numberOfLines={4}
+                    numberOfLines={1}
                     className="bg-white rounded-xl p-3 text-black mb-4"
                 />
                 {/* Submit Button */}
@@ -63,9 +97,16 @@ const CustomModal: React.FC<CustomModalProps> = ({ isModalVisible, handleModal }
                 {/* Cancel Button */}
                 <Pressable
                     onPress={handleModal}
-                    className="bg-buttonBlue rounded-xl p-3 items-center"
+                    className="bg-buttonBlue rounded-xl p-3 items-center mb-2"
                 >
                     <Text className="text-white font-semibold">Close</Text>
+                </Pressable>
+                {/* Delete later, debug button */}
+                <Pressable
+                    onPress={printDatabaseEntries}
+                    className="bg-buttonBlue rounded-xl p-3 items-center mb-2"
+                >
+                    <Text className="text-white font-semibold">print DB</Text>
                 </Pressable>
             </View>
         </Modal>
@@ -108,8 +149,8 @@ const LandingPage = () => {
                       Ready to Sync?
                   </Text>
 
-                  <Pressable className="my-10" onPress={() => navigation.navigate('HomePage')}>
-                      <View className="bg-buttonBlue rounded-2xl border-2 border-gray-500 w-2/5 p-4 px-6">
+                  <Pressable className="my-8" onPress={() => navigation.navigate('HomePage')}>
+                      <View className="bg-buttonBlue rounded-2xl border-2 border-gray-500 w-3/5 p-4 px-8">
                           <Text className="text-2xl font-bold text-white dark:text-white">
                               Continue
                           </Text>
