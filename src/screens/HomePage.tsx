@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Menu, CloudUpload, CloudDownload, RefreshCcw, Folder } from "lucide-react-native"; // Install this library or use another icon package
@@ -7,6 +7,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import {pickFile, readFile} from '@dr.pogodin/react-native-fs';
 import { generateHashMap } from '../utils/fsScanner.tsx';
+import DirectoryPicker from '../utils/dirPicker.tsx';
 
 
 type RootStackParamList = {
@@ -20,6 +21,7 @@ type NavigationProp = StackNavigationProp<RootStackParamList,'HomePage'>;
 const LandingPage = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
+  const [isModalVisible, setModalVisible] = useState(false);
 
   return (
     <SafeAreaView className="flex-1 bg-transparent" style={{ paddingTop: insets.top }}>
@@ -80,24 +82,29 @@ const LandingPage = () => {
             </View>
           </Pressable>
 
-          {/*Download Button*/}
-          <Pressable className="mx-0" onPress={async () => {
+
+          {/* Old function call sorry i moved it
+          async () => {
             const files = await pickFile();
             if (files.length > 0) {
               const content = await readFile(files[0]);
               console.log(content);
-            }
-          }}>
+            }*/}
+          {/*Download Button*/}
+          <Pressable className="mx-0" onPress={() => setModalVisible(true)}>
             <View className=" bg-transparent flex-row items-center p-2 mt-6">
               <View className="w-12 mx-2">
                 <Folder size={48} color="black"/>
               </View>
               <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
-                View Music Folder
+                Set Music Directory
               </Text>
             </View>
           </Pressable>
-
+          <DirectoryPicker
+            isVisible={isModalVisible}
+            handleModal={() => setModalVisible(false)}
+          />
         </View>
       </View>
     </SafeAreaView>
