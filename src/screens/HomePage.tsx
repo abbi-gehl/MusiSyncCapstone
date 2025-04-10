@@ -5,8 +5,9 @@ import { Menu, CloudUpload, CloudDownload, RefreshCcw, Folder } from "lucide-rea
 import "nativewind";
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
-import {pickFile, readFile} from '@dr.pogodin/react-native-fs'
+import { readFile} from '@dr.pogodin/react-native-fs'
 import { useTCP } from "../service/TCPProvider";
+import { Buffer } from 'buffer';
 
 type RootStackParamList = {
   LandingPage: undefined;
@@ -48,8 +49,9 @@ const LandingPage = () => {
         <View className="flex-1 bg-background rounded-br-none rounded-bl-none justify-start rounded-[50] w-full p-4 gap-y-8">
           {/*Upload Button*/}
           <Pressable className="mx-0" onPress={async () => {
-            const fileContent = await readFile(directory);
-            sendData(fileContent);
+            const fileContent = await readFile(directory, 'base64');
+            const data = Buffer.from(fileContent, 'base64');
+            sendData(data);
           }}>
             <View className="bg-transparent flex-row items-center p-2 mt-6">
                 <View className="w-12 mx-2">

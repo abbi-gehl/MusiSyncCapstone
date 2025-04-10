@@ -1,6 +1,7 @@
 import { createContext, FC, useCallback, useContext, useState } from "react";
 import { Alert } from "react-native";
 import TcpSocket from 'react-native-tcp-socket';
+import {Buffer} from 'buffer';
 
 interface TCPContextType {
     server: any;
@@ -8,12 +9,15 @@ interface TCPContextType {
     directory: string;
     isConnected: boolean;
     connectedClient: any;
+    sentFiles: any;
+    totalSentBytes: number;
+    totalReceivedBytes: number;
 
     setDeviceDirectory: (dir: string) => void;
     startServer: (port: number) => void;
     connectToServer: (host: string, port: number) => void;
     disconnect: () => void;
-    sendData: (data: string) => void;
+    sendData: (data: string | Buffer) => void;
 }
 
 const TCPContext = createContext<TCPContextType | undefined>(undefined);
@@ -35,8 +39,11 @@ export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
     const [client, setClient] = useState<any>(null);
     const [directory, setDirectory] = useState<string>('');
     const [serverSocket, setServerSocket] = useState<any>(null);
+    const [sentFiles, setSentFiles] = useState<any>([]);
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const [connectedClient, setConnectedClient] = useState<any>(null);
+    const [totalSentBytes, setTotalSentBytes] = useState<number>(0);
+    const [totalReceivedBytes, setTotalReceivedBytes] = useState<number>(0);
 
     // Set Device Directory helper function
     const setDeviceDirectory = useCallback((dir: string) => {
@@ -63,13 +70,14 @@ export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
 
         const newServer = TcpSocket.createTLSServer(options, socket => {
             console.log("Server connected: ", socket.address());
-
+            setIsConnected(true);
             setServerSocket(socket);
+
             socket.setNoDelay(true);
             socket.readableHighWaterMark = 1024 * 1024 * 1;
             socket.writableHighWaterMark = 1024 * 1024 * 1;
 
-            socket.on("data", data => {
+            socket.on("data", async data => {
                 console.log("Server received:", data);
             });
 
@@ -127,15 +135,20 @@ export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
         setClient(newClient);
     }, []);
 
-    const sendData = useCallback((data: string) => {
+    const sendData = useCallback(async (data: string | Buffer) => {
         const socket = client || server
         if (!socket) {
             console.log("No connection to send data");
             return;
         }
 
-        socket.write(JSON.stringify({ event: 'data', data: data }));
-    }, [server, client, isConnected]);
+        try {
+            await new Promise<void>(resolve => setTimeout(resolve, 10));
+            socket.write(JSON.stringify({event: "message", data: data}));
+        } catch (error) {
+            console.log("Error sending data:", error);
+        }
+    }, [server, client]);
 
     return (
         <TCPContext.Provider
@@ -145,11 +158,14 @@ export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
                 directory,
                 isConnected,
                 connectedClient,
+                sentFiles,
+                totalSentBytes,
+                totalReceivedBytes,
                 setDeviceDirectory,
                 startServer,
                 connectToServer,
                 disconnect,
-                sendData
+                sendData,
             }}>
             {children}
         </TCPContext.Provider>
