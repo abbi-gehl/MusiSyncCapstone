@@ -123,7 +123,6 @@ const LandingPage = () => {
     const { startServer, connectToServer } = useTCP();
     const [IP, setIP] = React.useState<string>("");
     const port = 5050;
-
     return (
       <SafeAreaView className="flex-1 bg-transparent gap-2" style={{ paddingTop: insets.top }}>
           {/* First Section (2/5 of the Screen) */}
@@ -162,20 +161,33 @@ const LandingPage = () => {
           {/* Second Section (3/5 of the Screen) */}
           <View className="flex-[3] bg-transparent ">
               <View className="flex-1 bg-background rounded-br-none rounded-bl-none rounded-[50] p-4 w-screen">
-                  <Text className="text-3xl font-semibold text-white dark:text-white text-center m-5 my-10">
-                      It's easy to get started with MusiSync!
-                  </Text>
-
                   <Text className="text-2xl font-semibold text-white dark:text-white text-center m-4">
-                      No email is required! Just click below to link devices.
+                      Connection Status: {isConnected ? "Connected" : "Disconnected"}
                   </Text>
                   <Pressable className="my-10 items-center" onPress={() => setModalVisible(true)}>
                       <View className="bg-buttonBlue border-2 border-gray-500 rounded-2xl p-4 px-6 w-2/3">
                           <Text className="text-2xl text-center font-bold text-white dark:text-white">
-                              Add Device
+                              Host
                           </Text>
                       </View>
                   </Pressable>
+                  <View className="my-10 items-center">
+                      <TextInput    
+                          className="bg-white border-2 border-gray-500 rounded-2xl p-4 px-6 w-2/3 text-xl mb-4"
+                          placeholder="Enter IP Address"
+                          value={IP}
+                          onChangeText={setIP}
+                          keyboardType="numeric"
+                      />
+                      <Pressable className="bg-buttonBlue border-2 border-gray-500 rounded-2xl p-4 px-6 w-2/3" onPress={() => {
+                        const items = IP.split(":");
+                        connectToServer(items[0], parseInt(items[1]));
+                      }}>
+                          <Text className="text-2xl text-center font-bold text-white dark:text-white">
+                              Connect
+                          </Text>
+                      </Pressable>
+                  </View>
               </View>
           </View>
           <CustomModal
