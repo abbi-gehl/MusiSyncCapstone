@@ -25,11 +25,11 @@ MusiSync aims to accomplish this without a centralised user database. The decent
 ## Tech Stack
 Our current plan for MusicSync is a fairly straightforward stack. The networking framework is subject to change as the team does not have much experience in the area.
 
-UI - TypeScript React Native
+UI - TypeScript React Native, NativeWind CSS wrapper
 
-Middleware - Node JS, Typescript
+Middleware - Node JS, Typescript, React Native Crypto JS, React Native TCP socket, React native netinfo
 
-Backend - React Native File System, Web RTC (Networking)
+Backend - React Native File System, Realm, Buffer
 
 
 

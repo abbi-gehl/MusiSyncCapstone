@@ -8,6 +8,8 @@ import {useNavigation} from '@react-navigation/native';
 import { readFile} from '@dr.pogodin/react-native-fs'
 import { useTCP } from "../service/TCPProvider";
 import { Buffer } from 'buffer';
+import {pickFile, readFile} from '@dr.pogodin/react-native-fs';
+import { generateHashMap } from '../utils/fsScanner.tsx';
 
 type RootStackParamList = {
   LandingPage: undefined;
@@ -18,8 +20,6 @@ type RootStackParamList = {
 type NavigationProp = StackNavigationProp<RootStackParamList,'HomePage'>;
 
 const LandingPage = () => {
-
-  const { directory, sendData } = useTCP();
 
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
@@ -64,14 +64,28 @@ const LandingPage = () => {
           </Pressable>
 
           {/*Download Button*/}
-          <View className=" bg-transparent flex-row items-center p-2 mt-8 gap-y-[8]">
-            <View className="w-12 mx-2">
-              <RefreshCcw size={48} color="black"/>
+          <Pressable className="mx-0" onPress={() => navigation.navigate('ChooseFilePage')}>
+            <View className="bg-transparent flex-row items-center p-2 mt-6">
+              <View className="w-12 mx-2">
+                <CloudDownload size={48} color="black"/>
+              </View>
+              <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
+                Download Files to other Devices
+              </Text>
             </View>
-            <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
-              Full Library Sync
-            </Text>
-          </View>
+          </Pressable>
+
+          {/*Full sync Button, currently used to test hash map*/}
+          <Pressable className="mx-0" onPress={() => generateHashMap()}>
+            <View className=" bg-transparent flex-row items-center p-2 mt-8 gap-y-[8]">
+              <View className="w-12 mx-2">
+                <RefreshCcw size={48} color="black"/>
+              </View>
+              <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
+                Full Library Sync
+              </Text>
+            </View>
+          </Pressable>
 
           {/*Download Button*/}
           <Pressable className="mx-0" onPress={() => navigation.navigate('ChooseFilePage')}>
