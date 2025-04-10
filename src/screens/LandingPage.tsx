@@ -120,7 +120,7 @@ const LandingPage = () => {
     const navigation = useNavigation<NavigationProp>();
     const [isModalVisible, setModalVisible] = useState(false);
 
-    const { startServer, connectToServer } = useTCP();
+    const { startServer, connectToServer, isConnected } = useTCP();
     const [IP, setIP] = React.useState<string>("");
     const port = 5050;
     return (

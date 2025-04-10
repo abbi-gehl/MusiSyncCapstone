@@ -5,7 +5,6 @@ import { Menu, CloudUpload, CloudDownload, RefreshCcw, Folder } from "lucide-rea
 import "nativewind";
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
-import { readFile} from '@dr.pogodin/react-native-fs'
 import { useTCP } from "../service/TCPProvider";
 import { Buffer } from 'buffer';
 import {pickFile, readFile} from '@dr.pogodin/react-native-fs';
@@ -23,6 +22,8 @@ const LandingPage = () => {
 
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
+
+  const { directory, sendData } = useTCP();
 
   return (
     <SafeAreaView className="flex-1 bg-transparent" style={{ paddingTop: insets.top }}>
