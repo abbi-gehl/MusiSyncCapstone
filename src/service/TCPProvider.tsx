@@ -143,7 +143,6 @@ export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
         }
 
         try {
-            await new Promise<void>(resolve => setTimeout(resolve, 10));
             socket.write(JSON.stringify({event: "message", data: data}));
         } catch (error) {
             console.log("Error sending data:", error);
