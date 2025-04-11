@@ -1,4 +1,5 @@
 import { Alert } from "react-native";
+import { Buffer } from "buffer";
 import { useChunkStore } from "../../db/chunkStore";
 
 export const recieveFileSyn = async (
@@ -70,5 +71,55 @@ export const recieveFileAck = async (
         }
     } catch (error) {
         console.log("Error sending chunk: ", error)
+    }
+}
+
+export const recieveFileSynAck = async (
+    chunk: any,
+    chunkNo: number,
+    socket: any,
+    setTotalReceivedBytes: any,
+    //generateFile: any,
+) => {
+    const { chunkStore, setChunkStore, resetChunkStore } = useChunkStore.getState();
+
+    if (!chunkStore) {
+        console.log("No file transfer initiated (null chunkStore)")
+        return;
+    }
+
+    try {
+        const bufferChunk = Buffer.from(chunk, 'base64');
+        const updatedChunkArray = [...(chunkStore.chunkArray || [])];
+        updatedChunkArray[chunkNo] = bufferChunk;
+
+        setChunkStore(
+            {
+                ...chunkStore,
+                chunkArray: updatedChunkArray,
+            }
+        );
+
+        setTotalReceivedBytes((prev: number) => prev + bufferChunk.length);
+        
+    } catch (error) {
+        console.log("Failed to recieve chunk: ", error);
+    }
+
+    if (chunkNo + 1 === chunkStore?.totalChunks) {
+        console.log("All Chunks Recieved!!!");
+        // Generate File here
+        resetChunkStore();
+        return;
+    }
+
+    try {
+        await new Promise<void>(resolve => setTimeout(resolve, 10));
+        console.log("Requesting Chunk #", chunkNo +1 );
+        socket.write(
+            JSON.stringify({event: "file_ack", chunkNo: chunkNo + 1})
+        )
+    } catch (error) {
+        console.log("Error requesting next chunk: ", error)
     }
 }
