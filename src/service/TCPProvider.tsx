@@ -1,7 +1,10 @@
 import { createContext, FC, useCallback, useContext, useState } from "react";
 import { Alert } from "react-native";
 import TcpSocket from 'react-native-tcp-socket';
-import {Buffer} from 'buffer';
+import { Buffer } from 'buffer';
+import * as RNFS from '@dr.pogodin/react-native-fs';
+import { useChunkStore } from "../../db/chunkStore";
+import { recieveFileSyn } from "./TCPUtils";
 
 interface TCPContextType {
     server: any;
@@ -18,32 +21,35 @@ interface TCPContextType {
     connectToServer: (host: string, port: number) => void;
     disconnect: () => void;
     sendData: (data: string | Buffer) => void;
+    sendFileSyn: (filePath: string) => void;
 }
 
 const TCPContext = createContext<TCPContextType | undefined>(undefined);
 
 export const useTCP = (): TCPContextType => {
-  const context = useContext(TCPContext);
-  if (!context) {
-    throw new Error('useTCP must be used within a TCPProvider');
-  }
-  return context;
+    const context = useContext(TCPContext);
+    if (!context) {
+        throw new Error('useTCP must be used within a TCPProvider');
+    }
+    return context;
 };
 
 const options = {
     keystore: require('../../tls_certs/server-keystore.p12'),
 };
 
-export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
+export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     const [server, setServer] = useState<any>(null);
     const [client, setClient] = useState<any>(null);
     const [directory, setDirectory] = useState<string>('');
     const [serverSocket, setServerSocket] = useState<any>(null);
-    const [sentFiles, setSentFiles] = useState<any>([]);
+    const [sentFiles, setSentFiles] = useState<string[]>([]);
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const [connectedClient, setConnectedClient] = useState<any>(null);
     const [totalSentBytes, setTotalSentBytes] = useState<number>(0);
     const [totalReceivedBytes, setTotalReceivedBytes] = useState<number>(0);
+
+    const {currentChunkSet, setCurrentChunkSet, setChunkStore} = useChunkStore();
 
     // Set Device Directory helper function
     const setDeviceDirectory = useCallback((dir: string) => {
@@ -79,6 +85,12 @@ export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
 
             socket.on("data", async data => {
                 console.log("Server received:", data);
+
+                const parsedData = JSON.parse(data?.toString());
+
+                if (parsedData?.event === "file_syn") {
+                    recieveFileSyn(parsedData.file, socket, setSentFiles);
+                }
             });
 
             socket.on("close", () => {
@@ -91,7 +103,7 @@ export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
             });
         });
 
-        newServer.listen({port, host: '10.0.2.15'}, () => {
+        newServer.listen({ port, host: '10.0.2.15' }, () => {
             const address = newServer.address();
             console.log(`Server running @ ${address?.address}:${address?.port}`);
         });
@@ -143,15 +155,62 @@ export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
         }
 
         try {
-            socket.write(JSON.stringify({event: "message", data: data}));
+            socket.write(JSON.stringify({ event: "message", data: data }));
         } catch (error) {
             console.log("Error sending data:", error);
         }
     }, [server, client]);
 
+    const sendFileSyn = async (filePath: string) => {
+        try {
+            const fileName = filePath.split('/').pop() || 'file';
+            const fileData = await RNFS.readFile(filePath, 'base64');
+            const fileBuffer = Buffer.from(fileData, 'base64');
+
+            const CHUNK_SIZE = 1024 * 8;
+
+            let totalChunks = 0;
+            let offset = 0;
+            let chunkArray = [];
+
+            while (offset < fileBuffer.length) {
+                const chunk = fileBuffer.slice(offset, offset + CHUNK_SIZE);
+                chunkArray.push(chunk);
+                offset += chunk.length;
+                totalChunks++;
+            }
+
+            const rawData = {
+                name: fileName,
+                size: fileBuffer.length,
+                totalChunks,
+            };
+
+            setCurrentChunkSet({
+                totalChunks,
+                chunkArray,
+            });
+
+            setSentFiles((prevFiles: string[]) => [...prevFiles, fileName]);
+
+            console.log("Total chunks:", totalChunks);
+            console.log("File name:", fileName);
+            console.log("File size:", fileBuffer.length);
+
+            const socket = client || server;
+            if (!socket) return;
+
+            socket.write(JSON.stringify({ event: "file_syn", file: rawData }));
+        }
+        catch (error) {
+            console.log("Error getting file stat:", error);
+            return;
+        }
+    }
+
     return (
         <TCPContext.Provider
-            value= {{
+            value={{
                 server,
                 client,
                 directory,
@@ -165,6 +224,7 @@ export const TCPProvider: FC<{children: React.ReactNode}> = ({children}) => {
                 connectToServer,
                 disconnect,
                 sendData,
+                sendFileSyn,
             }}>
             {children}
         </TCPContext.Provider>
