@@ -4,7 +4,7 @@ import TcpSocket from 'react-native-tcp-socket';
 import { Buffer } from 'buffer';
 import * as RNFS from '@dr.pogodin/react-native-fs';
 import { useChunkStore } from "../../db/chunkStore";
-import { recieveFileSyn } from "./TCPUtils";
+import { recieveFileAck, recieveFileSyn } from "./TCPUtils";
 
 interface TCPContextType {
     server: any;
@@ -91,6 +91,10 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
                 if (parsedData?.event === "file_syn") {
                     recieveFileSyn(parsedData.file, socket, setSentFiles);
                 }
+
+                if (parsedData?.event === "file_ack") {
+                    recieveFileAck(parsedData.chunkNo, socket, setTotalSentBytes);
+                }
             });
 
             socket.on("close", () => {
@@ -133,6 +137,16 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
 
         newClient.on("data", data => {
             console.log("Client received:", data);
+
+            const parsedData = JSON.parse(data?.toString());
+
+            if (parsedData?.event === "file_syn") {
+                recieveFileSyn(parsedData.file, newClient, setSentFiles);
+            }
+
+            if (parsedData?.event === "file_ack") {
+                recieveFileAck(parsedData.chunkNo, newClient, setTotalSentBytes);
+            }
         });
 
         newClient.on("close", () => {
