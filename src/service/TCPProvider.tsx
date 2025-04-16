@@ -41,7 +41,7 @@ const options = {
 export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     const [server, setServer] = useState<any>(null);
     const [client, setClient] = useState<any>(null);
-    const [directory, setDirectory] = useState<string>('');
+    const [directory, setDirectory] = useState<string>(RNFS.DownloadDirectoryPath);
     const [serverSocket, setServerSocket] = useState<any>(null);
     const [sentFiles, setSentFiles] = useState<string[]>([]);
     const [isConnected, setIsConnected] = useState<boolean>(false);
