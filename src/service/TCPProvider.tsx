@@ -84,8 +84,6 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
             socket.writableHighWaterMark = 1024 * 1024 * 1;
 
             socket.on("data", async data => {
-                console.log("Server received:", data);
-
                 const parsedData = JSON.parse(data?.toString());
 
                 if (parsedData?.event === "file_syn") {
@@ -140,8 +138,6 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
         newClient.writableHighWaterMark = 1024 * 1024 * 1;
 
         newClient.on("data", data => {
-            console.log("Client received:", data);
-
             const parsedData = JSON.parse(data?.toString());
 
             if (parsedData?.event === "file_syn") {
@@ -260,6 +256,7 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
 
             console.log("Total chunks:", totalChunks);
             console.log("File name:", fileName);
+            console.log("Assumed file type:", fileType);
             console.log("File size:", fileBuffer.length);
 
             const socket = client || server;
