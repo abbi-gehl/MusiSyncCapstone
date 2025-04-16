@@ -19,6 +19,7 @@ export const recieveFileSyn = async (
     setChunkStore({
         name: fileData.name,
         size: fileData.size,
+        type: fileData.type,
         totalChunks: fileData.totalChunks,
         chunkArray: [],
     });
@@ -79,7 +80,7 @@ export const recieveFileSynAck = async (
     chunkNo: number,
     socket: any,
     setTotalReceivedBytes: any,
-    //generateFile: any,
+    generateFile: any,
 ) => {
     const { chunkStore, setChunkStore, resetChunkStore } = useChunkStore.getState();
 
@@ -108,7 +109,7 @@ export const recieveFileSynAck = async (
 
     if (chunkNo + 1 === chunkStore?.totalChunks) {
         console.log("All Chunks Recieved!!!");
-        // Generate File here
+        generateFile();
         resetChunkStore();
         return;
     }

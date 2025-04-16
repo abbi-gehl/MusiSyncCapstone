@@ -97,7 +97,7 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
                 }
 
                 if (parsedData?.event === "file_syn_ack") {
-                    recieveFileSynAck(parsedData.chunk, parsedData.chunkNo, socket, setTotalReceivedBytes);
+                    recieveFileSynAck(parsedData.chunk, parsedData.chunkNo, socket, setTotalReceivedBytes, generateFile);
                 }
             });
 
@@ -154,7 +154,7 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
 
             
             if (parsedData?.event === "file_syn_ack") {
-                recieveFileSynAck(parsedData.chunk, parsedData.chunkNo, newClient, setTotalReceivedBytes);
+                recieveFileSynAck(parsedData.chunk, parsedData.chunkNo, newClient, setTotalReceivedBytes, generateFile);
             }
         });
 
@@ -170,6 +170,38 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
         setClient(newClient);
     }, []);
 
+    // Generate File
+    const generateFile = async () => {
+        const {chunkStore, resetChunkStore} = useChunkStore.getState();
+
+        if (!chunkStore) {
+            console.log("No chunkstore to generate from...")
+            return;
+        }
+
+        if (chunkStore?.totalChunks !== chunkStore.chunkArray.length) {
+            console.log("Not all Chunks recieved!", chunkStore.chunkArray.length, "/", chunkStore.totalChunks);
+            return;
+        }
+
+        try {
+            const combinedChunks = Buffer.concat(chunkStore.chunkArray);
+            const filePath = `${RNFS.DownloadDirectoryPath}/${chunkStore.name}${chunkStore.type}`;
+
+            await RNFS.writeFile(
+                filePath,
+                combinedChunks?.toString('base64'),
+                'base64',
+            );
+
+            console.log("File saved successfully @", filePath);
+            resetChunkStore();
+        } catch (error) {
+            console.log("Error saving file: ", error);
+        }
+    }
+
+    // Send Data
     const sendData = useCallback(async (data: string | Buffer) => {
         const socket = client || server
         if (!socket) {
@@ -184,6 +216,7 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
         }
     }, [server, client]);
 
+    // Send File Syn
     const sendFileSyn = async (filePath: string) => {
         try {
             const fileName = filePath.split('/').pop() || 'file';
@@ -206,6 +239,7 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
             const rawData = {
                 name: fileName,
                 size: fileBuffer.length,
+                type: ".mp3",
                 totalChunks,
             };
 

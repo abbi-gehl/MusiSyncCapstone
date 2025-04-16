@@ -5,6 +5,7 @@ interface ChunkState {
     chunkStore: {
         name: string;
         totalChunks: number;
+        type: string;
         chunkArray: Buffer[];
     } | null;
     currentChunkSet: {
