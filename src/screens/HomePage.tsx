@@ -1,13 +1,13 @@
 import React from "react";
-import {View, Text, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Menu, CloudUpload, CloudDownload, RefreshCcw, Folder } from "lucide-react-native"; // Install this library or use another icon package
 import "nativewind";
-import {StackNavigationProp} from '@react-navigation/stack';
-import {useNavigation} from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
 import { useTCP } from "../service/TCPProvider";
 import { Buffer } from 'buffer';
-import {pickFile, readFile} from '@dr.pogodin/react-native-fs';
+import { pickFile, readFile } from '@dr.pogodin/react-native-fs';
 import { generateHashMap } from '../utils/fsScanner.tsx';
 
 type RootStackParamList = {
@@ -16,14 +16,14 @@ type RootStackParamList = {
   ChooseFilePage: undefined;
 };
 
-type NavigationProp = StackNavigationProp<RootStackParamList,'HomePage'>;
+type NavigationProp = StackNavigationProp<RootStackParamList, 'HomePage'>;
 
 const LandingPage = () => {
 
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
 
-  const { directory, sendData } = useTCP();
+  const { directory, sendData, sendFileSyn } = useTCP();
 
   return (
     <SafeAreaView className="flex-1 bg-transparent" style={{ paddingTop: insets.top }}>
@@ -50,17 +50,23 @@ const LandingPage = () => {
         <View className="flex-1 bg-background rounded-br-none rounded-bl-none justify-start rounded-[50] w-full p-4 gap-y-8">
           {/*Upload Button*/}
           <Pressable className="mx-0" onPress={async () => {
-            const fileContent = await readFile(directory, 'base64');
-            const data = Buffer.from(fileContent, 'base64');
-            sendData(data);
+            try {
+              const files = await pickFile();
+              if (files.length > 0) {
+                sendFileSyn(files[0]);
+              }
+            }
+            catch (error) {
+              console.error("Error picking file:", error);
+            }
           }}>
             <View className="bg-transparent flex-row items-center p-2 mt-6">
-                <View className="w-12 mx-2">
-                  <CloudUpload size={48} color="black"/>
-                </View>
-                <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
-                  Send Files to connected device
-                </Text>
+              <View className="w-12 mx-2">
+                <CloudUpload size={48} color="black" />
+              </View>
+              <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
+                Send Files to connected device AwesomeTestingFunction
+              </Text>
             </View>
           </Pressable>
 
@@ -68,7 +74,7 @@ const LandingPage = () => {
           <Pressable className="mx-0" onPress={() => navigation.navigate('ChooseFilePage')}>
             <View className="bg-transparent flex-row items-center p-2 mt-6">
               <View className="w-12 mx-2">
-                <CloudDownload size={48} color="black"/>
+                <CloudDownload size={48} color="black" />
               </View>
               <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
                 Download Files to other Devices
@@ -80,7 +86,7 @@ const LandingPage = () => {
           <Pressable className="mx-0" onPress={() => generateHashMap()}>
             <View className=" bg-transparent flex-row items-center p-2 mt-8 gap-y-[8]">
               <View className="w-12 mx-2">
-                <RefreshCcw size={48} color="black"/>
+                <RefreshCcw size={48} color="black" />
               </View>
               <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
                 Full Library Sync
@@ -92,7 +98,7 @@ const LandingPage = () => {
           <Pressable className="mx-0" onPress={() => navigation.navigate('ChooseFilePage')}>
             <View className=" bg-transparent flex-row items-center p-2 mt-6">
               <View className="w-12 mx-2">
-                <Folder size={48} color="black"/>
+                <Folder size={48} color="black" />
               </View>
               <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
                 Choose File
