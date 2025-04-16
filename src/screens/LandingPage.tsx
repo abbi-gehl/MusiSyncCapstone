@@ -122,7 +122,7 @@ const LandingPage = () => {
 
     const { startServer, connectToServer, isConnected } = useTCP();
     const [IP, setIP] = React.useState<string>("");
-    const port = 5050;
+    const port = 5000;
     return (
       <SafeAreaView className="flex-1 bg-transparent gap-2" style={{ paddingTop: insets.top }}>
           {/* First Section (2/5 of the Screen) */}
@@ -164,7 +164,11 @@ const LandingPage = () => {
                   <Text className="text-2xl font-semibold text-white dark:text-white text-center m-4">
                       Connection Status: {isConnected ? "Connected" : "Disconnected"}
                   </Text>
-                  <Pressable className="my-10 items-center" onPress={() => setModalVisible(true)}>
+                  <Pressable className="my-10 items-center" onPress={() => {
+                    startServer(port);
+                    setModalVisible(true)
+                }
+                    }>
                       <View className="bg-buttonBlue border-2 border-gray-500 rounded-2xl p-4 px-6 w-2/3">
                           <Text className="text-2xl text-center font-bold text-white dark:text-white">
                               Host

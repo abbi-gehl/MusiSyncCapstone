@@ -220,6 +220,7 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
     const sendFileSyn = async (filePath: string) => {
         try {
             const fileName = filePath.split('/').pop() || 'file';
+            let fileType = '.mp3'
             const fileData = await RNFS.readFile(filePath, 'base64');
             const fileBuffer = Buffer.from(fileData, 'base64');
 
@@ -236,10 +237,17 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
                 totalChunks++;
             }
 
+            if (fileData.substring(0, 5) === "UklGR")
+                fileType = '.wav';
+            if (fileData.substring(0, 10) === "ZkxhQwAAAC")
+                fileType = '.flac';
+            if (fileData.substring(0, 4) === "SUQz")
+                fileType = '.mp3'
+
             const rawData = {
                 name: fileName,
                 size: fileBuffer.length,
-                type: ".mp3",
+                type: fileType,
                 totalChunks,
             };
 
