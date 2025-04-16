@@ -60,6 +60,13 @@ const ChooseFilePage = () => {
                             </Text>
                         </Pressable>
                     </View>
+                    <View className="items-center">
+                        <Pressable className="bg-buttonBlue rounded-2xl border-2 border-gray-500 w-2/5 p-4 px-6" onPress={() => navigation.navigate("HomePage")}>
+                            <Text className="text-2xl font-bold text-center text-white dark:text-white">
+                                Return
+                            </Text>
+                        </Pressable>
+                    </View>
                 </View>
             </View>
         </SafeAreaView>
