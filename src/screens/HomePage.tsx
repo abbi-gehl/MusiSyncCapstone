@@ -65,7 +65,7 @@ const LandingPage = () => {
                 <CloudUpload size={48} color="black" />
               </View>
               <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
-                Send Files to connected device AwesomeTestingFunction
+                Send Files to connected Device
               </Text>
             </View>
           </Pressable>
@@ -77,7 +77,7 @@ const LandingPage = () => {
                 <CloudDownload size={48} color="black" />
               </View>
               <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
-                Download Files to other Devices
+                Download Files from other Device
               </Text>
             </View>
           </Pressable>
