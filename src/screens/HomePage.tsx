@@ -83,7 +83,7 @@ const LandingPage = () => {
           </Pressable>
 
           {/*Full sync Button, currently used to test hash map*/}
-          <Pressable className="mx-0" onPress={() => generateHashMap()}>
+          <Pressable className="mx-0" onPress={() => generateHashMap(directory)}>
             <View className=" bg-transparent flex-row items-center p-2 mt-8 gap-y-[8]">
               <View className="w-12 mx-2">
                 <RefreshCcw size={48} color="black" />
