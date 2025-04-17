@@ -3,7 +3,7 @@ import {View, Text, TouchableOpacity, Pressable, Alert, TextInput } from 'react-
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRealm, useQuery } from '@realm/react'  // Realm DB for react
-import Realm, { BSON } from 'realm' // Realm DB
+import { BSON } from 'realm' // Realm DB
 import { StackNavigationProp } from '@react-navigation/stack';
 import Modal from "react-native-modal";
 import { Menu } from "lucide-react-native"; // Install this library or use another icon package

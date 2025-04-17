@@ -30,11 +30,11 @@ export function sendFiles(src: FileHashMap, dst: FileHashMap): [dictionary, dict
                 filesToDelete[existingHash] = value; // Remove the old version
             }else{
                 //file is new to the best of our knowledge
-                filesToSend[key] = value
+                filesToSend[key] = value;
             }
 
         }
 
-    })
-    return ([filesToSend, filesToDelete])
+    });
+    return ([filesToSend, filesToDelete]);
 }
