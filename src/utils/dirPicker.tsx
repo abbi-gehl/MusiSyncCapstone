@@ -41,6 +41,7 @@ const DirectoryPicker: React.FC<DirectoryPickerProps> = ({ isVisible, handleModa
       await AsyncStorage.setItem(STORAGE_KEY, input);
       setDirectory(input);
       Alert.alert('Success', 'Directory saved!');
+      setInput('');
       handleModal();
     } catch (error) {
       console.error('Error setting directory:', error);
@@ -67,7 +68,7 @@ const DirectoryPicker: React.FC<DirectoryPickerProps> = ({ isVisible, handleModa
           numberOfLines={1}
           className="bg-white rounded-xl p-3 text-black mb-4"
         />
-
+        <Text className="text-black font-semibold mb-2">For more info, look at our FAQ</Text>
         {/* Submit Button */}
         <Pressable
           onPress={handleSaveDirectory}
@@ -83,6 +84,7 @@ const DirectoryPicker: React.FC<DirectoryPickerProps> = ({ isVisible, handleModa
         >
           <Text className="text-white font-semibold">Close</Text>
         </Pressable>
+
       </View>
     </Modal>
   );
