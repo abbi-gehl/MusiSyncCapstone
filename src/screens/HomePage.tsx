@@ -1,6 +1,5 @@
-
-import React, {useState} from "react";
-import {View, Text, TouchableOpacity, Pressable } from 'react-native';
+import React from "react";
+import { View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Menu, CloudUpload, CloudDownload, RefreshCcw, Folder } from "lucide-react-native"; // Install this library or use another icon package
 import "nativewind";
@@ -10,7 +9,6 @@ import { useTCP } from "../service/TCPProvider";
 import { Buffer } from 'buffer';
 import { pickFile, readFile } from '@dr.pogodin/react-native-fs';
 import { generateHashMap } from '../utils/fsScanner.tsx';
-import DirectoryPicker from '../utils/dirPicker.tsx';
 
 type RootStackParamList = {
   LandingPage: undefined;
@@ -24,7 +22,6 @@ const LandingPage = () => {
 
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
-  const [isModalVisible, setModalVisible] = useState(false);
 
   const { directory, sendData, sendFileSyn } = useTCP();
 
@@ -96,30 +93,19 @@ const LandingPage = () => {
               </Text>
             </View>
           </Pressable>
-          {/* Old function call sorry i moved it
-          async () => {
-            const files = await pickFile();
-            if (files.length > 0) {
-              const content = await readFile(files[0]);
-              console.log(content);
-            }*/}
+
           {/*Download Button*/}
-          <Pressable className="mx-0" onPress={() => setModalVisible(true)}>
-          {/*Download Button*/}
-<!--       <Pressable className="mx-0" onPress={() => navigation.navigate('ChooseFilePage')}> -->
+          <Pressable className="mx-0" onPress={() => navigation.navigate('ChooseFilePage')}>
             <View className=" bg-transparent flex-row items-center p-2 mt-6">
               <View className="w-12 mx-2">
                 <Folder size={48} color="black" />
               </View>
               <Text className="shrink text-3xl font-semibold text-white dark:text-white m-5">
-                Set Music Directory
+                Choose File
               </Text>
             </View>
           </Pressable>
-          <DirectoryPicker
-            isVisible={isModalVisible}
-            handleModal={() => setModalVisible(false)}
-          />
+
         </View>
       </View>
     </SafeAreaView>
