@@ -1,7 +1,7 @@
 import * as RNFS from '@dr.pogodin/react-native-fs';
 import { MD5 } from 'react-native-crypto-js';
 
-type FileHashMap = Record<string, string>; // { fileHash: relativePath }
+export type FileHashMap = Record<string, string>; // { fileHash: relativePath }
 const HASH_MAP_FILE = `${RNFS.DocumentDirectoryPath}/fileHashMap.json`;
 
 /*

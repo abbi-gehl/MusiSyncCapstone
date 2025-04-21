@@ -1,6 +1,9 @@
 import { Alert } from "react-native";
 import { Buffer } from "buffer";
 import { useChunkStore } from "../../db/chunkStore";
+import { generateHashMap, FileHashMap} from "../utils/fsScanner";
+import { sendFiles, dictionary } from "../utils/sendFiles";
+import * as RNFS from '@dr.pogodin/react-native-fs';
 
 export const recieveFileSyn = async (
     fileData: any,
@@ -109,7 +112,7 @@ export const recieveFileSynAck = async (
 
     if (chunkNo + 1 === chunkStore?.totalChunks) {
         console.log("All Chunks Recieved!!!");
-        JSON.stringify({event: "file_ack", chunkNo: -1})
+        socket.write(JSON.stringify({event: "sync_ack"}));
         generateFile();
         return;
     }
@@ -126,9 +129,110 @@ export const recieveFileSynAck = async (
 }
 
 export const recieveSyncSyn = async (
-    hash: Record<string, string>,
+    hash: FileHashMap,
+    myDir: string,
     socket: any
 ) => {
-    console.log("Recieved: ", hash);
+    console.log("Recieved sync_syn of: ", hash);
+
+    const myHash = await generateHashMap(myDir);
+
+    console.log("myHash: ", myHash);
+
+    try {
+        await new Promise<void>(resolve => setTimeout(resolve, 10));
+        console.log("Sending sync_syn_ack...");
+        socket.write(JSON.stringify({ event: "sync_syn_ack", serverHash: hash, clientHash: myHash }));
+    } catch (error) {
+        console.log("Error sending sync_syn_ack: ", error);
+    }
 }
 
+export const recieveSyncSynAck = async (
+    serverHash: FileHashMap,
+    clientHash: FileHashMap,
+    myDir: string,
+    socket: any,
+    setFilesToSend: any,
+    setCurrentChunkSet: any,
+    setSentFiles: any,
+) => {
+    const diff = sendFiles(serverHash, clientHash);
+    const filesToSend: dictionary = diff[0];
+    const filesToDelete: dictionary = diff[1];
+
+    console.log("Files to send: ", filesToSend);
+    console.log("Files to delete: ", filesToDelete);
+
+    setFilesToSend(filesToSend);
+    recieveSyncAck(filesToSend, myDir, setFilesToSend, setCurrentChunkSet, setSentFiles, socket);
+}
+
+export const recieveSyncAck = async (
+    filesToSend: dictionary,
+    directory: string,
+    setFilesToSend: any,
+    setCurrentChunkSet: any,
+    setSentFiles: any,
+    socket: any,
+) => {
+    const nextFile = Object.keys(filesToSend)[0];
+    const nextFilePath = filesToSend[nextFile];
+
+    console.log("Recieved sync_ack, sending file: ", nextFilePath);
+
+    try {
+        let fileType = '.mp3'
+        const fileData = await RNFS.readFile(directory + nextFilePath, 'base64');
+        const fileBuffer = Buffer.from(fileData, 'base64');
+
+        const CHUNK_SIZE = 1024 * 8;
+
+        let totalChunks = 0;
+        let offset = 0;
+        let chunkArray = [];
+
+        while (offset < fileBuffer.length) {
+            const chunk = fileBuffer.slice(offset, offset + CHUNK_SIZE);
+            chunkArray.push(chunk);
+            offset += chunk.length;
+            totalChunks++;
+        }
+
+        if (fileData.substring(0, 5) === "UklGR")
+            fileType = '.wav';
+        if (fileData.substring(0, 10) === "ZkxhQwAAAC")
+            fileType = '.flac';
+        if (fileData.substring(0, 4) === "SUQz")
+            fileType = '.mp3'
+
+        const rawData = {
+            name: nextFilePath,
+            size: fileBuffer.length,
+            type: fileType,
+            totalChunks,
+        };
+
+        setCurrentChunkSet({
+            totalChunks,
+            chunkArray,
+        });
+
+        setSentFiles((prevFiles: string[]) => [...prevFiles, nextFilePath]);
+
+        console.log("Total chunks:", totalChunks);
+        console.log("File name:", nextFilePath);
+        console.log("Assumed file type:", fileType);
+        console.log("File size:", fileBuffer.length);
+
+        setFilesToSend((prevFiles: dictionary) => {
+            const updatedFiles = { ...prevFiles };
+            delete updatedFiles[nextFile]; // Remove the sent file from the list
+            return updatedFiles;
+        });
+
+        socket.write(JSON.stringify({event:"file_syn", file: rawData}));
+    } catch (error) {
+        console.log("Error sending file: ", error);
+    }
+}

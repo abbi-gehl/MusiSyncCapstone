@@ -3,9 +3,11 @@ import TcpSocket from 'react-native-tcp-socket';
 import { Buffer } from 'buffer';
 import * as RNFS from '@dr.pogodin/react-native-fs';
 import { useChunkStore } from "../../db/chunkStore";
-import { recieveFileAck, recieveFileSyn, recieveFileSynAck, recieveSyncSyn } from "./TCPUtils";
+import { recieveFileAck, recieveFileSyn, recieveFileSynAck, recieveSyncSynAck, recieveSyncSyn, recieveSyncAck } from "./TCPUtils";
 import { generateHashMap } from "../utils/fsScanner";
 import {request, PERMISSIONS} from 'react-native-permissions';
+import { dictionary } from "../utils/sendFiles";
+
 
 interface TCPContextType {
     server: any;
@@ -14,6 +16,7 @@ interface TCPContextType {
     isConnected: boolean;
     connectedClient: any;
     sentFiles: any;
+    filesToSend: any;
     totalSentBytes: number;
     totalReceivedBytes: number;
 
@@ -46,6 +49,7 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
     const [directory, setDirectory] = useState<string>(RNFS.DownloadDirectoryPath);
     const [serverSocket, setServerSocket] = useState<any>(null);
     const [sentFiles, setSentFiles] = useState<string[]>([]);
+    const [filesToSend, setFilesToSend] = useState<dictionary>();
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const [connectedClient, setConnectedClient] = useState<any>(null);
     const [totalSentBytes, setTotalSentBytes] = useState<number>(0);
@@ -102,7 +106,16 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
                 }
 
                 if (parsedData?.event === "sync_syn") {
-                    recieveSyncSyn(parsedData.hash, socket);
+                    recieveSyncSyn(parsedData.hash, directory, socket);
+                }
+
+                if (parsedData?.event === "sync_syn_ack") {
+                    recieveSyncSynAck(parsedData.serverHash, parsedData.clientHash, directory, socket, setFilesToSend, setCurrentChunkSet, setSentFiles);
+                }
+
+                if (parsedData?.event === "sync_ack") {
+                    if (!filesToSend) return;
+                    recieveSyncAck(filesToSend, directory, setFilesToSend, setCurrentChunkSet, setSentFiles, socket);
                 }
             });
 
@@ -157,13 +170,21 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
                 recieveFileAck(parsedData.chunkNo, newClient, setTotalSentBytes);
             }
 
-            
             if (parsedData?.event === "file_syn_ack") {
                 recieveFileSynAck(parsedData.chunk, parsedData.chunkNo, newClient, setTotalReceivedBytes, generateFile);
             }
 
             if (parsedData?.event === "sync_syn") {
-                recieveSyncSyn(parsedData.hash, newClient);
+                recieveSyncSyn(parsedData.hash, directory, newClient);
+            }
+
+            if (parsedData?.event === "sync_syn_ack") {
+                recieveSyncSynAck(parsedData.serverHash, parsedData.clientHash, directory, newClient, setFilesToSend, setCurrentChunkSet, setSentFiles);
+            }
+
+            if (parsedData?.event === "sync_ack") {
+                if (!filesToSend) return;
+                recieveSyncAck(filesToSend, directory, setFilesToSend, setCurrentChunkSet, setSentFiles, newClient);
             }
         });
 
@@ -309,6 +330,7 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
                 isConnected,
                 connectedClient,
                 sentFiles,
+                filesToSend,
                 totalSentBytes,
                 totalReceivedBytes,
                 setDeviceDirectory,
