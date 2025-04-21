@@ -109,8 +109,8 @@ export const recieveFileSynAck = async (
 
     if (chunkNo + 1 === chunkStore?.totalChunks) {
         console.log("All Chunks Recieved!!!");
+        JSON.stringify({event: "file_ack", chunkNo: -1})
         generateFile();
-        resetChunkStore();
         return;
     }
 
@@ -124,3 +124,11 @@ export const recieveFileSynAck = async (
         console.log("Error requesting next chunk: ", error)
     }
 }
+
+export const recieveSyncSyn = async (
+    hash: Record<string, string>,
+    socket: any
+) => {
+    console.log("Recieved: ", hash);
+}
+
