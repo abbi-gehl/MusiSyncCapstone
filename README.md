@@ -4,6 +4,7 @@ MusiSync is a cross platform application that aims to allow for users to sync th
 
 ## How to Run
 First, [set up your enviornment.](https://reactnative.dev/docs/0.76/set-up-your-environment)
+
 Next, [configure Android emulator](https://www.waldo.com/blog/run-a-react-native-app)
 
 Navigate to the downloaded repository in your terminal.
