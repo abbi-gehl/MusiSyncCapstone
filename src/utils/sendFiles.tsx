@@ -1,4 +1,4 @@
-type dictionary = {[key: string]: string};
+export type dictionary = {[key: string]: string};
 type FileHashMap = Record<string, string>; // { key :fileHash = value: relativePath }
 
 // function to find files to send FROM source TO destination
