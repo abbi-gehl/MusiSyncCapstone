@@ -1,10 +1,11 @@
 import { createContext, FC, useCallback, useContext, useState } from "react";
-import { Alert } from "react-native";
 import TcpSocket from 'react-native-tcp-socket';
 import { Buffer } from 'buffer';
 import * as RNFS from '@dr.pogodin/react-native-fs';
 import { useChunkStore } from "../../db/chunkStore";
-import { recieveFileAck, recieveFileSyn, recieveFileSynAck } from "./TCPUtils";
+import { recieveFileAck, recieveFileSyn, recieveFileSynAck, recieveSyncSyn } from "./TCPUtils";
+import { generateHashMap } from "../utils/fsScanner";
+import {request, PERMISSIONS} from 'react-native-permissions';
 
 interface TCPContextType {
     server: any;
@@ -22,6 +23,7 @@ interface TCPContextType {
     disconnect: () => void;
     sendData: (data: string | Buffer) => void;
     sendFileSyn: (filePath: string) => void;
+    sendSyncSyn: (dir: string) => void;
 }
 
 const TCPContext = createContext<TCPContextType | undefined>(undefined);
@@ -78,6 +80,7 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
             console.log("Server connected: ", socket.address());
             setIsConnected(true);
             setServerSocket(socket);
+            setClient(socket);
 
             socket.setNoDelay(true);
             socket.readableHighWaterMark = 1024 * 1024 * 1;
@@ -96,6 +99,10 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
 
                 if (parsedData?.event === "file_syn_ack") {
                     recieveFileSynAck(parsedData.chunk, parsedData.chunkNo, socket, setTotalReceivedBytes, generateFile);
+                }
+
+                if (parsedData?.event === "sync_syn") {
+                    recieveSyncSyn(parsedData.hash, socket);
                 }
             });
 
@@ -133,6 +140,8 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
             setIsConnected(true);
         });
 
+        setServer(newClient);
+
         newClient.setNoDelay(true);
         newClient.readableHighWaterMark = 1024 * 1024 * 1;
         newClient.writableHighWaterMark = 1024 * 1024 * 1;
@@ -151,6 +160,10 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
             
             if (parsedData?.event === "file_syn_ack") {
                 recieveFileSynAck(parsedData.chunk, parsedData.chunkNo, newClient, setTotalReceivedBytes, generateFile);
+            }
+
+            if (parsedData?.event === "sync_syn") {
+                recieveSyncSyn(parsedData.hash, newClient);
             }
         });
 
@@ -270,6 +283,23 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
         }
     }
 
+    const sendSyncSyn = async (dir: string) => {
+        try {
+            await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+            const hash = await generateHashMap(dir);
+
+            console.log(`Generated hashmap of ${dir}:`, hash);
+            console.log("Sending sync_syn...");
+
+            const socket = client || server;
+            if (!socket) return;
+
+            socket.write(JSON.stringify({event: "sync_syn", hash: hash}));
+        } catch (error) {
+            console.error(`Error generating hashmap from ${dir}:`, error);
+        }
+    }
+
     return (
         <TCPContext.Provider
             value={{
@@ -287,6 +317,7 @@ export const TCPProvider: FC<{ children: React.ReactNode }> = ({ children }) => 
                 disconnect,
                 sendData,
                 sendFileSyn,
+                sendSyncSyn,
             }}>
             {children}
         </TCPContext.Provider>
