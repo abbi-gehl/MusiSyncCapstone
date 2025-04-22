@@ -67,7 +67,7 @@ const CustomModal: React.FC<CustomModalProps> = ({ isModalVisible, handleModal }
     return (
         <Modal isVisible={isModalVisible}>
             <View className="bg-accentBlue p-6 rounded-2xl">
-                <Text className="text-black text-lg font-bold mb-2">Link your devices with a Mac Address</Text>
+                <Text className="text-black text-lg font-bold mb-2">Link your devices with a IP Address</Text>
                 <Text className="text-black mb-6">If you need more info, check our documentation</Text>
 
                 <TextInput
@@ -82,7 +82,7 @@ const CustomModal: React.FC<CustomModalProps> = ({ isModalVisible, handleModal }
                 <TextInput
                     value={text}
                     onChangeText={setText}
-                    placeholder="Enter MAC address or identifier..."
+                    placeholder="Enter IP address or identifier..."
                     placeholderTextColor="#ccc"
                     numberOfLines={1}
                     className="bg-white rounded-xl p-3 text-black mb-4"
@@ -101,13 +101,13 @@ const CustomModal: React.FC<CustomModalProps> = ({ isModalVisible, handleModal }
                 >
                     <Text className="text-white font-semibold">Close</Text>
                 </Pressable>
-                {/* Delete later, debug button */}
+                {/* {/* Delete later, debug button /}
                 <Pressable
                     onPress={printDatabaseEntries}
                     className="bg-buttonBlue rounded-xl p-3 items-center mb-2"
                 >
                     <Text className="text-white font-semibold">print DB</Text>
-                </Pressable>
+                </Pressable> */}
             </View>
         </Modal>
     );
