@@ -1,0 +1,26 @@
+name: Windows CI
+on: [pull_request]
+
+jobs:
+  run-windows-tests:
+    name: Build & run tests
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout Code
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '^18'
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install node modules
+        run: npm install
+
+      - name: Run Windows x64 release
+        run: npx react-native run-windows --arch x64 --release --logging
+
