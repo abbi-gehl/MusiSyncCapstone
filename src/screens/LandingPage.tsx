@@ -101,13 +101,13 @@ const CustomModal: React.FC<CustomModalProps> = ({ isModalVisible, handleModal }
                 >
                     <Text className="text-white font-semibold">Close</Text>
                 </Pressable>
-                {/* Delete later, debug button */}
+                {/* {/* Delete later, debug button /}
                 <Pressable
                     onPress={printDatabaseEntries}
                     className="bg-buttonBlue rounded-xl p-3 items-center mb-2"
                 >
                     <Text className="text-white font-semibold">print DB</Text>
-                </Pressable>
+                </Pressable> */}
             </View>
         </Modal>
     );
