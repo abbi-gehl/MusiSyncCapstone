@@ -15,7 +15,7 @@ Navigate to the downloaded repository in your terminal.
 
 **Platform Options**
 - `run-android`
-- `run-windows`
+- `run-windows` *Dev in Progress
 - `run-ios` *untested
 - `run-macos` *untested
 
